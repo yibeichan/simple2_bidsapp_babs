@@ -40,64 +40,75 @@ cd $SCRATCH_DIR
 # rm -rf freesurfer.sif
 
 # Create the FreeSurfer BIDS App config YAML file
-echo "Creating FreeSurfer BIDS App config YAML file..."
-CONFIG_PATH="$SCRATCH_DIR/config_fs.yaml"
+# echo "Creating FreeSurfer BIDS App config YAML file..."
+# CONFIG_PATH="$SCRATCH_DIR/config_fs.yaml"
 
-cat > "$CONFIG_PATH" << 'EOL'
-# This is a config yaml file for FreeSurfer BIDS App
+# cat > "$CONFIG_PATH" << 'EOL'
+# # This is a config yaml file for FreeSurfer BIDS App
 
-# Arguments passed to the application inside the container
-singularity_run:
-    --fs-license-file: "/orcd/scratch/bcs/001/yibei/prettymouth_babs/license.txt"
-    --skip-bids-validation: ""
-    --n_cpus: "16"
-    $SUBJECT_SELECTION_FLAG: "--participant_label"
+# # Arguments passed to the application inside the container
+# singularity_run:
+#     --fs-license-file: "/orcd/scratch/bcs/001/yibei/prettymouth_babs/license.txt"
+#     --skip-bids-validation: ""
+#     --n_cpus: "16"
+#     $SUBJECT_SELECTION_FLAG: "--participant_label"
 
-# Output foldername(s) to be zipped:
-zip_foldernames:
-    $TO_CREATE_FOLDER: "true"
-    freesurfer: "8.0.0"
+# # Output foldername(s) to be zipped:
+# zip_foldernames:
+#     $TO_CREATE_FOLDER: "true"
+#     freesurfer: "8.0.0"
 
-# How much cluster resources it needs:
-cluster_resources:
-    interpreting_shell: "/bin/bash"
-    hard_memory_limit: 30G
-    hard_runtime_limit: "12:00:00"
+# # How much cluster resources it needs:
+# cluster_resources:
+#     interpreting_shell: "/bin/bash"
+#     customized_text: |
+#         #SBATCH --partition=mit_normal
+#         #SBATCH --cpus-per-task=16
+#         #SBATCH --mem=30G
+#         #SBATCH --time=04:00:00
 
-# Necessary commands to be run first:
-script_preamble: |
-    source ~/.bashrc 
-    micromamba activate simple2
-    module load apptainer/1.1.9
+# # Necessary commands to be run first:
+# script_preamble: |
+#     source ~/.bashrc 
+#     micromamba activate simple2
+#     module load apptainer/1.1.9
 
-# Where to run the jobs:
-job_compute_space: "/orcd/scratch/bcs/001/yibei/freesurfer_compute"
+# # Where to run the jobs:
+# job_compute_space: "/orcd/scratch/bcs/001/yibei/freesurfer_compute"
 
-required_files:
-  $INPUT_DATASET_#1:
-    - "anat/*_T1w.nii*"
+# required_files:
+#   $INPUT_DATASET_#1:
+#     - "anat/*_T1w.nii*"
 
-# Alert messages that might be found in log files of failed jobs:
-alert_log_messages:
-  stdout:
-    - "ERROR:"
-    - "Cannot allocate memory"
-    - "mris_curvature_stats: Could not open file"
-    - "Numerical result out of range"
-    - "FreeSurfer failed"
-    - "recon-all: error"
-EOL
+# # Alert messages that might be found in log files of failed jobs:
+# alert_log_messages:
+#   stdout:
+#     - "ERROR:"
+#     - "Cannot allocate memory"
+#     - "mris_curvature_stats: Could not open file"
+#     - "Numerical result out of range"
+#     - "FreeSurfer failed"
+#     - "recon-all: error"
+# EOL
 
-echo "YAML config file created at $CONFIG_PATH"
+# echo "YAML config file created at $CONFIG_PATH"
 
-babs-init \
-    --where_project ${PWD} \
-    --project_name  fs_bidsapp \
-    --input BIDS ${PWD}/Brown \
-    --container_ds ${PWD}/fs_bidsapp-container \
-    --container_name freesurfer-8-0-0 \
-    --container_config_yaml_file ${PWD}/config_fs.yaml \
-    --type_session single-ses \
-    --type_system slurm
+# babs init \
+#     --where_project ${PWD} \
+#     --project_name fs_bidsapp \
+#     --input BIDS ${PWD}/Brown \
+#     --container_ds ${PWD}/fs_bidsapp-container \
+#     --container_name freesurfer-8-0-0 \
+#     --container_config_yaml_file ${PWD}/config_fs.yaml \
+#     --type_session single-ses \
+#     --type_system slurm
 
+cd fs_bidsapp
 
+# babs check-setup \
+#     --project_root ${PWD} \
+#     --job_test
+
+# babs status --project-root $PWD
+
+babs submit --project-root $PWD 
