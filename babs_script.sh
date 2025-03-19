@@ -55,20 +55,20 @@ singularity_run:
 
 # Output foldername(s) to be zipped:
 zip_foldernames:
-  	$TO_CREATE_FOLDER: "true"
-  	freesurfer: "8.0.0"
+    $TO_CREATE_FOLDER: "true"
+    freesurfer: "8.0.0"
 
 # How much cluster resources it needs:
 cluster_resources:
-  	interpreting_shell: "/bin/bash"
-  	hard_memory_limit: 30G
-  	hard_runtime_limit: "12:00:00"
+    interpreting_shell: "/bin/bash"
+    hard_memory_limit: 30G
+    hard_runtime_limit: "12:00:00"
 
 # Necessary commands to be run first:
 script_preamble: |
-  	source ~/.bashrc 
-  	micromamba activate simple2
-  	module load apptainer/1.1.9
+    source ~/.bashrc 
+    micromamba activate simple2
+    module load apptainer/1.1.9
 
 # Where to run the jobs:
 job_compute_space: "/orcd/scratch/bcs/001/yibei/freesurfer_compute"
@@ -95,14 +95,9 @@ babs-init \
     --project_name  fs_bidsapp \
     --input BIDS ${PWD}/Brown \
     --container_ds ${PWD}/fs_bidsapp-container \
-    --container_name fs_bidsapp-8-0-0 \
+    --container_name freesurfer-8-0-0 \
     --container_config_yaml_file ${PWD}/config_fs.yaml \
     --type_session single-ses \
     --type_system slurm
-
-# From this point, all echo statements and command outputs will be logged
-# Example:
-# echo "Starting next phase of processing"
-# datalad command-that-produces-output
 
 
