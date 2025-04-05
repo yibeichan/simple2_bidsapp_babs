@@ -61,7 +61,7 @@ singularity_args:
 
 # Output foldername(s) to be zipped:
 zip_foldernames:
-    freesurfer-bidsapp: "0-1-0"
+    freesurfer_bidsapp: "0-1-0"
 
 # How much cluster resources it needs:
 cluster_resources:
