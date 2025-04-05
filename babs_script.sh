@@ -28,18 +28,18 @@ datalad install "$DATALAD_URL"
 
 cd $SCRATCH_DIR
 
-cp /home/yibei/fs_bidsapp_babs/freesurfer.sif .
+cp /home/yibei/fs_bidsapp_babs/freesurfer_bidsapp.sif .
 
 datalad create -D "freesurfer BIDS App" fs_bidsapp-container
 
 cd fs_bidsapp-container
 
 datalad containers-add \
-    --url ${PWD}/../freesurfer.sif \
-    freesurfer-8-0-0
+    --url ${PWD}/../freesurfer_bidsapp.sif \
+    freesurfer-bidsapp-0-1-0
 
 cd ../
-rm -rf freesurfer.sif
+rm -rf freesurfer_bidsapp.sif
 
 # Create the FreeSurfer BIDS App config YAML file
 echo "Creating FreeSurfer BIDS App config YAML file..."
@@ -61,16 +61,16 @@ singularity_args:
 
 # Output foldername(s) to be zipped:
 zip_foldernames:
-    freesurfer: "8-0-0"
+    freesurfer-bidsapp: "0-1-0"
 
 # How much cluster resources it needs:
 cluster_resources:
     interpreting_shell: "/bin/bash"
     customized_text: |
         #SBATCH --partition=mit_normal
-        #SBATCH --cpus-per-task=16
-        #SBATCH --mem=30G
-        #SBATCH --time=04:00:00
+        #SBATCH --cpus-per-task=1
+        #SBATCH --mem=24G
+        #SBATCH --time=02:30:00
         #SBATCH --job-name=fs_bidsapp
 
 # Necessary commands to be run first:
@@ -105,7 +105,7 @@ echo "YAML config file created at $CONFIG_PATH"
 babs init \
     --datasets BIDS=${PWD}/$DATASET_NAME \
     --container_ds ${PWD}/fs_bidsapp-container \
-    --container_name freesurfer-8-0-0 \
+    --container_name freesurfer-bidsapp-0-1-0 \
     --container_config ${PWD}/config_fs.yaml \
     --processing_level subject \
     --queue slurm \
