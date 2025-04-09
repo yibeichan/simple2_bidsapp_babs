@@ -1,0 +1,10 @@
+adhd200/Brown                             
+adhd200/Peking_1
+adhd200/KKI                               
+adhd200/NeuroIMAGE                        
+adhd200/Peking_2 
+adhd200/Peking_3
+adhd200/NYU                               
+adhd200/Pittsburgh
+adhd200/OHSU                              
+adhd200/WashU
