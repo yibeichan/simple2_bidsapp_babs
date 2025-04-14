@@ -4,15 +4,16 @@ if [ -f ".env" ]; then
 fi
 
 # Set up logging - redirect all further output to a log file while still showing in console
-LOG_FILE="$SCRATCH_DIR/babs_script_$(date +%Y%m%d_%H%M%S).log"
+LOG_FILE="$SCRATCH_DIR_FS/babs_script_$(date +%Y%m%d_%H%M%S).log"
 echo "=== Script started at $(date) ===" | tee $LOG_FILE
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-echo "Environment: SCRATCH_DIR=$SCRATCH_DIR, BASE_DIR=$BASE_DIR"
+echo "Environment: SCRATCH_DIR=$SCRATCH_DIR_FS, BASE_DIR=$BASE_DIR"
 
 # Accept dataset name and input path as arguments
 INPUT_PATH="$1"  # Accept input path as first argument
 DATASET_NAME="$2"  # Accept dataset name as second argument
+SCRATCH_DIR=$SCRATCH_DIR_FS
 
 if [ -z "$INPUT_PATH" ] || [ -z "$DATASET_NAME" ]; then
     echo "Error: Missing arguments. Usage: $0 <input_path> <dataset_name>"
@@ -85,7 +86,7 @@ if [ -d "${PWD}/fs_bidsapp-container" ] && [ -f "${PWD}/fs_bidsapp-container/.da
 else
     echo "Setting up container..."
     if [ ! -f "${PWD}/freesurfer_bidsapp.sif" ]; then
-        cp /home/yibei/fs_bidsapp_babs/freesurfer_bidsapp.sif .
+        cp /home/yibei/simple2_bidsapp_babs/freesurfer_bidsapp.sif .
     fi
     
     # Create the container dataset if it doesn't exist
@@ -173,7 +174,7 @@ babs init \
     $SCRATCH_DIR/$DATASET_NAME/fs_bidsapp_${SITE_NAME}/
 
 cd $SCRATCH_DIR/$DATASET_NAME/fs_bidsapp_${SITE_NAME}
-babs submit ${PWD} --all
+babs submit --all
 # babs check-setup ${PWD} --job_test
 
 # # If babs check-setup is successful, submit all jobs
