@@ -1,13 +1,13 @@
-abide1/Caltech  
-abide1/CMU_b 
-abide1/Leuven_1 
-abide1/MaxMun_a 
-abide1/MaxMun_c 
-abide1/NYU  
-abide1/Olin 
-abide1/SBL  
-abide1/sidecards 
-abide1/Trinity 
-abide1/UCLA_2  
-abide1/UM_2  
-abide1/Yale
+Caltech  
+# CMU_b 
+# Leuven_1 
+# MaxMun_a 
+# MaxMun_c 
+# NYU  
+# Olin  
+# SBL  
+# sidecards 
+# Trinity 
+# UCLA_2  
+# UM_2  
+# Yale

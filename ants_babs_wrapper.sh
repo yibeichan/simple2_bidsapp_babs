@@ -41,7 +41,7 @@ while IFS= read -r dataset_path_raw; do
     echo "==============================================="
     
     # Call the main script with the dataset path and dataset name using full path
-    "$BASE_DIR/ants_babs_script.sh" "$DATA_DIR/$dataset_path" "$DATASET_NAME"
+    "$BASE_DIR/ants_babs_script.sh" "$dataset_path" "$DATASET_NAME"
     
     # Optional: Add a delay between processing datasets
     # sleep 10

@@ -11,74 +11,23 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 echo "Environment: SCRATCH_DIR=$SCRATCH_DIR_ANTS, BASE_DIR=$BASE_DIR"
 
 # Accept dataset name and input path as arguments
-INPUT_PATH="$1"  # Accept input path as first argument
+SITE_NAME="$1"  # Accept input path as first argument
 DATASET_NAME="$2"  # Accept dataset name as second argument
 SCRATCH_DIR=$SCRATCH_DIR_ANTS
 
-if [ -z "$INPUT_PATH" ] || [ -z "$DATASET_NAME" ]; then
-    echo "Error: Missing arguments. Usage: $0 <input_path> <dataset_name>"
+if [ -z "$SITE_NAME" ] || [ -z "$DATASET_NAME" ]; then
+    echo "Error: Missing arguments. Usage: $0 <site_name> <dataset_name>"
     exit 1
 fi
 
 # Extract site name from input path
-SITE_NAME=$(basename "$INPUT_PATH")
-echo "Processing site: $SITE_NAME from path: $INPUT_PATH for dataset: $DATASET_NAME"
+echo "Processing site: $SITE_NAME for dataset: $DATASET_NAME"
 
 source ~/.bashrc
 micromamba activate simple2
 mkdir -p $SCRATCH_DIR/$DATASET_NAME
 cd $SCRATCH_DIR/$DATASET_NAME
 echo "Current directory: $PWD"
-
-# Create site directory
-mkdir -p "$SCRATCH_DIR/$DATASET_NAME/$SITE_NAME"
-
-# Copy only anat folders from the dataset, but skip existing files
-echo "Copying only anat folders from $INPUT_PATH to $SCRATCH_DIR/$DATASET_NAME/$SITE_NAME (skipping existing files)"
-
-# Find all anat folders
-find "$INPUT_PATH" -type d -name "anat" | while read anat_dir; do
-  # Get the relative path of this anat folder within the original dataset
-  rel_path=$(echo "$anat_dir" | sed "s|$INPUT_PATH/||")
-  
-  # Create the target directory
-  target_dir="$SCRATCH_DIR/$DATASET_NAME/$SITE_NAME/$rel_path"
-  mkdir -p "$target_dir"
-  
-  # Copy all files from the anat directory, but skip if they already exist
-  find "$anat_dir" -type f | while read src_file; do
-    # Get the filename
-    filename=$(basename "$src_file")
-    # Check if file already exists
-    if [ -f "$target_dir/$filename" ]; then
-      echo "Skipping existing file: $target_dir/$filename"
-    else
-      echo "Copying: $src_file -> $target_dir/$filename"
-      cp "$src_file" "$target_dir/"
-    fi
-  done
-done
-
-# Also copy the dataset_description.json file and other important BIDS files if they exist
-for bids_file in dataset_description.json README participants.tsv participants.json CHANGES; do
-  target_file="$SCRATCH_DIR/$DATASET_NAME/$SITE_NAME/$bids_file"
-  if [ -f "$INPUT_PATH/$bids_file" ]; then
-    if [ -f "$target_file" ]; then
-      echo "Skipping existing BIDS file: $bids_file"
-    else
-      echo "Copying BIDS file: $bids_file"
-      cp "$INPUT_PATH/$bids_file" "$target_file"
-    fi
-  fi
-done
-
-# Initialize the copied directory as a datalad dataset
-echo "Initializing the copied directory as a datalad dataset..."
-cd "$SCRATCH_DIR/$DATASET_NAME/$SITE_NAME"
-datalad create -f -d .
-# Add all files to the dataset
-datalad save -m "Initial commit of copied BIDS data"
-cd "$SCRATCH_DIR/$DATASET_NAME"
 
 # Check if container setup is already done
 if [ -d "${PWD}/ants_bidsapp-container" ] && [ -f "${PWD}/ants_bidsapp-container/.datalad/config" ] && grep -q "ants-bidsapp-0-1-0" "${PWD}/ants_bidsapp-container/.datalad/config" 2>/dev/null; then
@@ -133,7 +82,7 @@ cluster_resources:
         #SBATCH --partition=mit_preemptable
         #SBATCH --cpus-per-task=8
         #SBATCH --mem=24G
-        #SBATCH --time=02:30:00
+        #SBATCH --time=04:00:00
         #SBATCH --job-name=ants_bidsapp
 # Necessary commands to be run first:
 script_preamble: |
@@ -161,7 +110,7 @@ cd $SCRATCH_DIR/$DATASET_NAME
 
 # Initialize BABS with the dataset-specific output directory
 babs init \
-    --datasets BIDS=$SCRATCH_DIR/$DATASET_NAME/$SITE_NAME \
+    --datasets BIDS=$DATALAD_SET_DIR/$DATASET_NAME/$SITE_NAME \
     --container_ds ${PWD}/ants_bidsapp-container \
     --container_name ants-bidsapp-0-1-0 \
     --container_config $SCRATCH_DIR/$DATASET_NAME/config_ants.yaml \
